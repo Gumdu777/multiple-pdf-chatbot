@@ -1,8 +1,6 @@
-streamlit==1.17.0
-PyPDF2==2.11.2
-langchain==0.0.211
-langchain-community==0.0.12
-google-generativeai==0.3.0
+streamlit==1.21.0
+PyPDF2==1.28.0
+langchain==0.17.0
+google-generativeai==0.0.1  # Google Gemini API package
 faiss-cpu==1.7.4
-python-dotenv==1.0.0
-altair==4.2.0
+dotenv==0.21.0
