@@ -1,17 +1,16 @@
+import os
 import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-import os
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-import google.generativeai as genai
 from langchain_community.vectorstores import FAISS
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
+from langchain.chains import ConversationalRetrievalChain
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load environment variables and configure API
 load_dotenv()
+
 google_api_key = os.getenv("GOOGLE_API_KEY")
 
 if not google_api_key:
@@ -20,8 +19,8 @@ if not google_api_key:
 
 genai.configure(api_key=google_api_key)
 
+# Function to extract text from PDF files
 def get_pdf_text(pdf_docs):
-    """Extracts text from uploaded PDF files."""
     text = ""
     for pdf in pdf_docs:
         pdf_reader = PdfReader(pdf)
@@ -31,20 +30,28 @@ def get_pdf_text(pdf_docs):
                 text += page_text
     return text
 
+# Function to split the extracted text into smaller chunks
 def get_text_chunks(text):
-    """Splits the extracted text into smaller chunks."""
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    chunks = text_splitter.split_text(text)
-    return chunks
+    return text_splitter.split_text(text)
 
+# Function to get Google Gemini embeddings for a piece of text
+def get_gemini_embeddings(text: str):
+    """Call Gemini API to get embeddings for a piece of text."""
+    response = genai.generate_embeddings(
+        model="models/embedding-001",  # Replace with your actual Gemini model for embeddings
+        text=text
+    )
+    return response.embeddings
+
+# Function to create a vector store using FAISS and Google Gemini embeddings
 def get_vector_store(text_chunks):
-    """Generates and saves vector store using FAISS and GoogleGenerativeAIEmbeddings."""
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
+    embeddings = [get_gemini_embeddings(chunk) for chunk in text_chunks]
+    vector_store = FAISS.from_embeddings(embeddings, texts=text_chunks)
     vector_store.save_local("faiss_index")
 
+# Function to set up a conversational chain for answering questions
 def get_conversational_chain():
-    """Sets up a question-answering chain with a custom prompt."""
     prompt_template = """
     Answer the question as detailed as possible from the provided context.
     If the answer is not in the context, say: 'Answer is not available in the context.'
@@ -54,30 +61,29 @@ def get_conversational_chain():
     Answer:
     """
     
-    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+    # Using Gemini's chat model for responses (can be adjusted if needed)
+    model = genai.Chat(model="gemini-pro")
     prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-    chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
     
-    return chain
+    return ConversationalRetrievalChain.from_chain(model=model, retriever=FAISS.load_local("faiss_index").as_retriever(), prompt=prompt)
 
+# Function to process user input and return a response
 def user_input(user_question):
-    """Processes the user's question and returns a response from the vector store."""
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    
-    # Enable dangerous deserialization only if you're sure the file is safe
-    new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
-    
+    embeddings = get_gemini_embeddings
+    new_db = FAISS.load_local("faiss_index", embeddings)
     docs = new_db.similarity_search(user_question)
     
+    # Use the conversational chain to answer the question
     chain = get_conversational_chain()
     response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
     
     st.write("Reply:", response.get("output_text", "No response available"))
 
+# Main Streamlit app
 def main():
     """Main function to run the Streamlit app."""
     st.set_page_config(page_title="Chat with Multiple PDFs", page_icon="💁")
-    st.header("Chat with Multiple PDFs using Gemini ")
+    st.header("Chat with Multiple PDFs using Gemini")
     
     user_question = st.text_input("Ask a question from the PDF files:")
     
