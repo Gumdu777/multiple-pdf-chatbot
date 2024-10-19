@@ -2,21 +2,27 @@ import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-import google.generativeai as genai
-from langchain_community.vectorstores import FAISS  # Corrected the import
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.embeddings.google_palm import GooglePalmEmbeddings  # Updated import
+from langchain.chat_models import ChatGooglePalm  # Updated import
+from langchain_community.vectorstores import FAISS  # Corrected import
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 
-# Load environment variables and set API key
+# Load environment variables and configure API
 load_dotenv()
-os.getenv("GOOGLE_API_KEY")
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+google_api_key = os.getenv("GOOGLE_API_KEY")
+
+if not google_api_key:
+    st.error("Google API key not found. Please set it in the .env file.")
+    st.stop()
+
+# Initialize the Google Palm API using the provided key
+# Assuming `genai` was being used to configure the API
+# This setup is now done automatically within langchain when using GooglePalmEmbeddings or ChatGooglePalm
 
 def get_pdf_text(pdf_docs):
-    """Extract text from PDF files."""
+    """Extracts text from uploaded PDF files."""
     text = ""
     for pdf in pdf_docs:
         pdf_reader = PdfReader(pdf)
@@ -25,64 +31,28 @@ def get_pdf_text(pdf_docs):
     return text
 
 def get_text_chunks(text):
-    """Split extracted text into smaller chunks."""
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
+    """Splits the extracted text into smaller chunks."""
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     chunks = text_splitter.split_text(text)
     return chunks
 
 def get_vector_store(text_chunks):
-    """Generate vector store from text chunks using FAISS and Google Generative AI Embeddings."""
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    """Generates and saves vector store using FAISS and GooglePalmEmbeddings."""
+    embeddings = GooglePalmEmbeddings(model="models/embedding-001")  # Updated to use GooglePalmEmbeddings
     vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
     vector_store.save_local("faiss_index")
 
 def get_conversational_chain():
-    """Create a conversational chain using a custom prompt."""
+    """Sets up a question-answering chain with a custom prompt."""
     prompt_template = """
-    Answer the question as detailed as possible from the provided context. If the answer is not in
-    the provided context, say, "answer is not available in the context" without making assumptions.
-
+    Answer the question as detailed as possible from the provided context.
+    If the answer is not in the context, say: 'Answer is not available in the context.'
+    
     Context:\n {context}\n
-    Question: \n{question}\n
+    Question:\n {question}\n
     Answer:
     """
-
-    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
-    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-    chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
     
-    return chain
-
-def user_input(user_question):
-    """Take user input and return the response from the conversational chain."""
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    new_db = FAISS.load_local("faiss_index", embeddings)
-    docs = new_db.similarity_search(user_question)
-
-    chain = get_conversational_chain()
-    response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
-
-    st.write("Reply:", response.get("output_text", "No response available"))
-
-def main():
-    """Main function for the Streamlit app."""
-    st.set_page_config(page_title="Chat with PDF", page_icon="💁")
-    st.header("Chat with PDF using Gemini💁")
-
-    user_question = st.text_input("Ask a Question from the PDF Files")
-
-    if user_question:
-        user_input(user_question)
-
-    with st.sidebar:
-        st.title("Menu:")
-        pdf_docs = st.file_uploader("Upload your PDF Files and click Submit & Process", accept_multiple_files=True)
-        if st.button("Submit & Process"):
-            with st.spinner("Processing..."):
-                raw_text = get_pdf_text(pdf_docs)
-                text_chunks = get_text_chunks(raw_text)
-                get_vector_store(text_chunks)
-                st.success("Done processing.")
-
-if __name__ == "__main__":
-    main()
+    model = ChatGooglePalm(model="gemini-pro", temperature=0.3)  # Updated to use ChatGooglePalm
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+    chain = load_qa_chain(model, chain_type="stuff"
