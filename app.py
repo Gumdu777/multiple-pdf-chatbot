@@ -2,8 +2,8 @@ import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
-from langchain.embeddings.google_palm import GooglePalmEmbeddings  # Updated import
-from langchain.chat_models import ChatGooglePalm  # Updated import
+from langchain_community.embeddings import GooglePalmEmbeddings  # Updated import
+from langchain_community.chat_models import ChatGooglePalm  # Updated import
 from langchain_community.vectorstores import FAISS  # Corrected import
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
