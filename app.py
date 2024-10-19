@@ -38,7 +38,8 @@ def get_text_chunks(text):
 def get_vector_store(text_chunks):
     """Generates and saves vector store using FAISS and GooglePalmEmbeddings."""
     try:
-        embeddings = GooglePalmEmbeddings(model="models/embedding-001")  # Updated to use GooglePalmEmbeddings
+        # Pass the google_api_key when creating the embeddings instance
+        embeddings = GooglePalmEmbeddings(model="models/embedding-001", google_api_key=google_api_key)  
         vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
         vector_store.save_local("faiss_index")
     except Exception as e:
@@ -67,7 +68,8 @@ def get_conversational_chain():
 def user_input(user_question):
     """Processes the user's question and returns a response from the vector store."""
     try:
-        embeddings = GooglePalmEmbeddings(model="models/embedding-001")  # Updated to use GooglePalmEmbeddings
+        # Pass the google_api_key when creating the embeddings instance
+        embeddings = GooglePalmEmbeddings(model="models/embedding-001", google_api_key=google_api_key)  
         
         new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
         
