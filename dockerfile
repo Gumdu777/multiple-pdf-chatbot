@@ -1,29 +1,19 @@
-# Use an official Python runtime as a parent image
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Set the working directory in the container
-WORKDIR /app
-
-# Install system dependencies for faiss, pillow, and other libraries
+# Install system dependencies for Pillow and FAISS
 RUN apt-get update && apt-get install -y \
-    swig \
-    libopenblas-dev \
-    liblapack-dev \
-    libjpeg-dev \
-    zlib1g-dev \  # Add zlib development libraries
-    libpng-dev \
-    build-essential \
-    python3-dev \
-    && apt-get clean
+    zlib1g-dev libjpeg-dev libpng-dev \
+    swig libopenblas-dev liblapack-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Install Python dependencies from requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy your application code
+COPY . .
 
-# Expose port 8501 to allow access to Streamlit app
-EXPOSE 8501
-
-# Run the Streamlit app when the container starts
-CMD ["streamlit", "run", "app.py"]
+# Set entry point for Streamlit
+ENTRYPOINT ["streamlit", "run"]
+CMD ["app.py"]
