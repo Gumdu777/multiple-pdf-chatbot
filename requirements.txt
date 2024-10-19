@@ -1,7 +1,6 @@
 streamlit==1.17.0
 PyPDF2==2.11.2
-langchain==0.3.0  # Version chosen based on available range
-langchain-community==0.0.9  # Earlier version to match langchain-core dependencies
+langchain==0.3.0
 google-generativeai==0.3.0
 faiss-cpu==1.7.4
 python-dotenv==1.0.0
