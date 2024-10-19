@@ -8,6 +8,7 @@ from langchain_community.vectorstores import FAISS  # Corrected import
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
+import logging
 
 # Load environment variables and configure API
 load_dotenv()
@@ -38,12 +39,18 @@ def get_text_chunks(text):
 def get_vector_store(text_chunks):
     """Generates and saves vector store using FAISS and GooglePalmEmbeddings."""
     try:
+        # Initialize logging
+        logging.basicConfig(level=logging.INFO)
+        logging.info("Initializing GooglePalmEmbeddings with model and API key.")
+        
         # Pass the google_api_key when creating the embeddings instance
         embeddings = GooglePalmEmbeddings(model="models/embedding-001", google_api_key=google_api_key)  
         vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
         vector_store.save_local("faiss_index")
+        logging.info("Vector store generated successfully.")
     except Exception as e:
         st.error(f"Error generating vector store: {e}")
+        logging.error(f"Error details: {e}")
 
 def get_conversational_chain():
     """Sets up a question-answering chain with a custom prompt."""
@@ -63,6 +70,7 @@ def get_conversational_chain():
         return chain
     except Exception as e:
         st.error(f"Error initializing conversational chain: {e}")
+        logging.error(f"Error details: {e}")
         return None
 
 def user_input(user_question):
@@ -85,6 +93,7 @@ def user_input(user_question):
             st.write("Reply:", response.get("output_text", "No response available"))
     except Exception as e:
         st.error(f"Error processing user question: {e}")
+        logging.error(f"Error details: {e}")
 
 def main():
     """Main function to run the Streamlit app."""
