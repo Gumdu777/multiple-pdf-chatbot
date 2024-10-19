@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libopenblas-dev \
     liblapack-dev \
     libjpeg-dev \
-    zlib1g-dev \
+    zlib1g-dev \  # Add zlib development libraries
     libpng-dev \
     build-essential \
     python3-dev \
