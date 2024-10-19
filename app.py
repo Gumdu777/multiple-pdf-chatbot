@@ -18,7 +18,6 @@ if not google_api_key:
     st.stop()
 
 # Initialize the Google Palm API using the provided key
-# Assuming `genai` was being used to configure the API
 # This setup is now done automatically within langchain when using GooglePalmEmbeddings or ChatGooglePalm
 
 def get_pdf_text(pdf_docs):
@@ -38,7 +37,7 @@ def get_text_chunks(text):
 
 def get_vector_store(text_chunks):
     """Generates and saves vector store using FAISS and GooglePalmEmbeddings."""
-    embeddings = GooglePalmEmbeddings(model="models/embedding-001")  # Updated to use GooglePalmEmbeddings
+    embeddings = GooglePalmEmbeddings(model="models/aqa")  # Updated to use the new model
     vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
     vector_store.save_local("faiss_index")
 
@@ -53,7 +52,7 @@ def get_conversational_chain():
     Answer:
     """
     
-    model = ChatGooglePalm(model="gemini-pro", temperature=0.3)  # Updated to use ChatGooglePalm
+    model = ChatGooglePalm(model="models/aqa", temperature=0.2)  # Updated to use the new model
     prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
     chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
     
@@ -61,7 +60,7 @@ def get_conversational_chain():
 
 def user_input(user_question):
     """Processes the user's question and returns a response from the vector store."""
-    embeddings = GooglePalmEmbeddings(model="models/embedding-001")  # Updated to use GooglePalmEmbeddings
+    embeddings = GooglePalmEmbeddings(model="models/aqa")  # Updated to use the new model
     
     new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
     
