@@ -102,9 +102,7 @@ Once the app is running, open your browser and navigate to `http://localhost:850
 
 ## Screenshots
 
-| Upload PDFs | Ask Questions |
-|-------------|----------------|
-| ![Upload PDFs](path_to_image) | ![Ask Questions](path_to_image) |
+ ![Upload PDFs](path_to_image) 
 
 ## Future Enhancements
 
