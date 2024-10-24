@@ -17,7 +17,7 @@ Follow these steps to install and run the project locally.
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - Google API Key (for using the Google Generative AI API and embeddings)
 
 ### Clone the Repository
@@ -102,7 +102,7 @@ Once the app is running, open your browser and navigate to `http://localhost:850
 
 ## Screenshots
 
- ![Upload PDFs](path_to_image) 
+ ![Upload PDFs](Screenshot 2024-09-14 172108.png) 
 
 ## Future Enhancements
 
