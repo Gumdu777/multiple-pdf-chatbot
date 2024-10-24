@@ -102,8 +102,7 @@ Once the app is running, open your browser and navigate to `http://localhost:850
 
 ## Screenshots
 
- ![Upload PDFs](multiple-pdf-chatbot
-/Screenshot 2024-09-14 172108.png) 
+ ![Upload PDFs](/Screenshot 2024-09-14 172108.png) 
 
 ## Future Enhancements
 
