@@ -113,6 +113,4 @@ Once the app is running, open your browser and navigate to `http://localhost:850
 
 
 
-```
 
-This is now formatted for Markdown (`.md`) files. You can copy this directly into your `README.md` file and modify the placeholder values accordingly.
