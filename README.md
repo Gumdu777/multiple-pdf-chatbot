@@ -102,7 +102,7 @@ Once the app is running, open your browser and navigate to `http://localhost:850
 
 ## Screenshots
 
-![Upload PDFs](./upload_pdfs.png) 
+![Upload PDFs](./pdf.png) 
 
 ## Future Enhancements
 
