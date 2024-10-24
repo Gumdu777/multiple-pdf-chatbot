@@ -102,7 +102,7 @@ Once the app is running, open your browser and navigate to `http://localhost:850
 
 ## Screenshots
 
- ![Upload PDFs](/Screenshot 2024-09-14 172108.png) 
+/Screenshot 2024-09-14 172108.png 
 
 ## Future Enhancements
 
