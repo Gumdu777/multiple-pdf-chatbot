@@ -23,9 +23,9 @@ Follow these steps to install and run the project locally.
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/multiple-pdf-chatbot.git
+git clone https://github.com/Gumdu777/multiple-pdf-chatbot.git
 cd multiple-pdf-chatbot
-
+```
 
 ### Create a Virtual Environment
 
