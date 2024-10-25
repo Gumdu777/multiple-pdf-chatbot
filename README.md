@@ -1,116 +1,86 @@
-
 # Multiple PDF Chatbot
 
-This project is a **Streamlit-based web application** that allows users to chat with multiple PDF documents by asking questions in natural language. It leverages **Google's Gemini model**, **FAISS** for vector-based similarity search, and **GooglePalmEmbeddings** to provide intelligent answers based on the uploaded PDF files.
+A streamlined solution for querying across multiple PDF documents using an intelligent chatbot interface. This project leverages natural language processing (NLP) capabilities powered by Google Generative AI, efficient vector storage through FAISS, and a user-friendly web interface built with Streamlit. 
+
+## Project Overview
+
+The **Multiple PDF Chatbot** enables users to interact with multiple PDF documents by asking natural language questions. This chatbot provides a precise response by utilizing vector embeddings for efficient document search and Google Generative AI for question understanding. It is ideal for anyone needing rapid insights from large PDF collections, such as researchers, analysts, and legal professionals.
 
 ## Features
 
-- Upload multiple PDF files and extract their text.
-- Split large documents into manageable text chunks for better question answering.
-- Use FAISS to generate and store vector embeddings of the text chunks.
-- Ask questions in natural language and receive accurate answers based on the context within the uploaded PDFs.
-- Powered by **Google Generative AI API (Gemini)** and **FAISS** for high-quality conversational AI interactions.
+- **Natural Language Questioning**: Ask questions in plain English, and the chatbot retrieves relevant information directly from the PDFs.
+- **Multiple PDF Support**: Upload multiple PDFs, making it easy to query across various documents.
+- **Efficient Document Search**: Uses FAISS for storing and querying vector embeddings, ensuring fast and accurate results.
+- **Web-Based Interface**: Streamlit provides a simple, accessible web application interface for seamless user interaction.
+- **Scalable Solution**: Suitable for large datasets of PDF documents due to the efficient FAISS-based vector store.
 
-## Installation
+## Installation Guide
 
-Follow these steps to install and run the project locally.
+To get started with the Multiple PDF Chatbot, follow these steps:
 
-### Prerequisites
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Gumdu777/multiple-pdf-chatbot.git
+   cd multiple-pdf-chatbot
+   ```
 
-- Python 3.10+
-- Google API Key (for using the Google Generative AI API and embeddings)
+2. **Set Up a Virtual Environment**  
+   It's recommended to use a virtual environment to manage dependencies.
+   ```bash
+   python3 -m venv env
+   source env/bin/activate  # On Windows use `env\Scripts\activate`
+   ```
 
-### Clone the Repository
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```bash
-git clone https://github.com/Gumdu777/multiple-pdf-chatbot.git
-cd multiple-pdf-chatbot
-```
+4. **Set Up Google API Key**  
+   Add your Google Generative AI API key to a `.env` file in the root directory:
+   ```
+   GOOGLE_API_KEY=your_api_key_here
+   ```
 
-### Create a Virtual Environment
+5. **Run the Application**
+   ```bash
+   streamlit run main.py
+   ```
 
-It is recommended to create a virtual environment to manage dependencies.
+## Detailed Usage Instructions
 
-```bash
-python -m venv venv
-source venv/bin/activate  # For Windows use: venv\Scripts\activate
-```
+1. **Upload PDFs**  
+   Use the "Upload PDF" button to upload one or more PDF documents.
 
-### Install Dependencies
+2. **Ask Questions**  
+   Type questions in the input box. The chatbot will analyze your question, search through the PDF content, and return the most relevant response.
 
-Install the necessary Python libraries by running:
+3. **View Results**  
+   The answer to each query is displayed directly in the chat window. You can also review which document sections were referenced to generate the response.
 
-```bash
-pip install -r requirements.txt
-```
+## Technology Stack
 
-### Setup Environment Variables
-
-Create a `.env` file in the root directory of the project and add your **Google API Key**:
-
-```bash
-GOOGLE_API_KEY=your_google_api_key_here
-```
-
-> Make sure to replace `your_google_api_key_here` with your actual API key.
-
-### Run the Application
-
-Start the Streamlit app by running:
-
-```bash
-streamlit run app.py
-```
-
-Once the app is running, open your browser and navigate to `http://localhost:8501`.
-
-## How It Works
-
-### PDF Upload & Text Extraction
-
-- Upload one or more PDF files through the sidebar.
-- The application extracts text from each page of the uploaded PDFs using `PyPDF2`.
-  
-### Text Chunking
-
-- The extracted text is split into smaller chunks using `RecursiveCharacterTextSplitter`. This ensures the chunks are of manageable size for embedding and processing.
-  
-### Vector Store Creation
-
-- The text chunks are transformed into embeddings using **GooglePalmEmbeddings**.
-- The embeddings are stored in a **FAISS vector store**, allowing for efficient similarity searches.
-
-### Question Answering
-
-- The user inputs a question, which is compared to the stored text chunks using FAISS's similarity search.
-- Relevant text chunks are passed into a custom prompt template, and the answer is generated using **Google Gemini (ChatGooglePalm)**.
-  
-### Error Handling
-
-- Comprehensive error handling is provided for file uploads, vector store creation, and question-answering operations.
-
-
-
-## Technologies Used
-
-- **Streamlit**: For building the web application interface.
-- **GooglePalmEmbeddings**: For generating vector embeddings from text.
-- **Google Generative AI API (Gemini)**: For answering questions based on the context of the uploaded PDFs.
-- **FAISS**: For efficient similarity search across text chunks.
-- **PyPDF2**: For extracting text from PDF documents.
-- **LangChain**: For managing the chain of operations in question-answering.
-
-## Screenshots
-
-![Upload PDFs](./pdf.png) 
+- **Programming Language**: Python
+- **Web Framework**: Streamlit
+- **Vector Database**: FAISS (Facebook AI Similarity Search) for efficient document embedding and retrieval
+- **NLP Model**: Google Generative AI for understanding and responding to user queries
+- **Environment Management**: Python virtual environments
+- **APIs**: Google Generative AI API for NLP capabilities
 
 ## Future Enhancements
 
-- Support for additional file formats (e.g., DOCX, TXT).
-- Improve the accuracy of answers by refining the prompt template.
-- Enable caching for frequently asked questions.
-- Add support for multi-user sessions.
+Planned improvements for this project include:
 
+- **Enhanced Multi-Language Support**: Extend NLP capabilities to support queries in multiple languages.
+- **Integration with Additional Document Types**: Extend compatibility beyond PDF to other document types (e.g., DOCX, TXT).
+- **User Authentication**: Implement user authentication for access control and personalized document interaction.
+- **Improved Query Accuracy**: Fine-tune the FAISS embedding search to better handle ambiguous queries.
 
+## Author and Contact Information
 
+Created by [Tejas Kudale](https://www.linkedin.com/in/tejas-kudale-8854812b3).
+
+For questions or collaboration inquiries, feel free to reach out via GitHub or LinkedIn.
+
+---
 
