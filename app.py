@@ -25,9 +25,11 @@ def get_pdf_text(pdf_docs):
         try:
             pdf_reader = PdfReader(pdf)
             for page in pdf_reader.pages:
-                text += page.extract_text() or ""  # Handle potential None return
+                page_text = page.extract_text() or ""
+                text += page_text
         except Exception as e:
-            st.error(f"Error reading {pdf.name}: {e}")
+            st.error(f"Error reading {pdf.name}: {str(e)}")
+            logging.error(f"Error reading {pdf.name}: {str(e)}")
     return text
 
 def get_text_chunks(text):
