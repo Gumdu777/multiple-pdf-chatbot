@@ -98,7 +98,7 @@ def user_input(user_question):
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
         # Load the FAISS vector store
-        new_db = FAISS.load_local("faiss_index", embeddings)
+        new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 
         # Perform similarity search
         docs = new_db.similarity_search(user_question)
