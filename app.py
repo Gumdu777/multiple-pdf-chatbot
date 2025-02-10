@@ -2,13 +2,14 @@ import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
-from langchain_community.embeddings import GooglePalmEmbeddings  # Updated import
+from langchain_community.embeddings import HuggingFaceEmbeddings  # Updated import
 from langchain_community.chat_models import ChatGooglePalm  # Updated import
 from langchain_community.vectorstores import FAISS  # Corrected import
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 import logging
+import google.generativeai as genai
 
 # Load environment variables and configure API
 load_dotenv()
@@ -17,6 +18,8 @@ google_api_key = os.getenv("GOOGLE_API_KEY")
 if not google_api_key:
     st.error("Google API key not found. Please set it in the .env file.")
     st.stop()
+
+genai.configure(api_key=google_api_key)
 
 def get_pdf_text(pdf_docs):
     """Extracts text from uploaded PDF files."""
@@ -38,18 +41,31 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
+def generate_embeddings(text, model_name="models/embedding-001"):
+    """Generates embeddings for the given text using the Gemini API."""
+    model = genai.GenerativeModel(model_name)
+    try:
+        response = model.embed(text)
+        return response.embedding.value
+    except Exception as e:
+        print(f"Error generating embeddings: {e}")
+        return None
+
 def get_vector_store(text_chunks):
-    """Generates and saves vector store using FAISS and GooglePalmEmbeddings."""
+    """Generates and saves vector store using FAISS and Gemini embeddings."""
     try:
         # Initialize logging
         logging.basicConfig(level=logging.INFO)
-        logging.info("Initializing GooglePalmEmbeddings with model and API key.")
-        
-        # Pass the google_api_key when creating the embeddings instance
-        embeddings = GooglePalmEmbeddings(model="models/embedding-001", google_api_key=google_api_key)  
+        logging.info("Initializing HuggingFaceEmbeddings.")
+
+        # Use HuggingFaceEmbeddings to generate embeddings
+        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+        # Create the FAISS vector store
         vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
         vector_store.save_local("faiss_index")
         logging.info("Vector store generated successfully.")
+
     except Exception as e:
         st.error(f"Error generating vector store: {e}")
         logging.error(f"Error details: {e}")
@@ -78,11 +94,13 @@ def get_conversational_chain():
 def user_input(user_question):
     """Processes the user's question and returns a response from the vector store."""
     try:
-        # Pass the google_api_key when creating the embeddings instance
-        embeddings = GooglePalmEmbeddings(model="models/embedding-001", google_api_key=google_api_key)  
-        
-        new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
-        
+        # Initialize HuggingFaceEmbeddings
+        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+        # Load the FAISS vector store
+        new_db = FAISS.load_local("faiss_index", embeddings)
+
+        # Perform similarity search
         docs = new_db.similarity_search(user_question)
         
         if not docs:
